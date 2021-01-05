@@ -11,6 +11,8 @@ public class ReactorMain {
 
     public static void main(String[] args) {
         Database db = Database.getInstance();
+        // rwlock = new ReentrantReadWriteLock();
+        db.initialize("./Courses.txt");
         try {
             db.registerUser("omri", "123", Role.Student);
         } catch (DatabaseError e) {
@@ -25,9 +27,9 @@ public class ReactorMain {
         try {
             User omri = db.getUser("omri");
             omri.login();
-            db.courseReg(omri, db.getCourse(530));
-            db.courseReg(omri, db.getCourse(912));
-            db.courseReg(omri, db.getCourse(482));
+            db.courseReg(omri, 530);
+            db.courseReg(omri, 912);
+            db.courseReg(omri, 482);
         } catch (DatabaseError e1) {
             System.out.println(e1);
         }

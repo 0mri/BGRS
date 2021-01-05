@@ -10,7 +10,7 @@ import java.net.Socket;
 public class EchoClient {
 
     public static void main(String[] args) throws IOException {
-        byte a = 98;
+        byte a = 112;
         if (args.length == 0) {
             args = new String[] { "localhost", "hello" };
         }
@@ -26,7 +26,7 @@ public class EchoClient {
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
 
             System.out.println("sending message to server");
-            out.write(a);
+            out.write(args[1]);
             out.newLine();
             out.flush();
 

@@ -36,8 +36,6 @@ public class Database {
 
     // to prevent user from creating new Database
     private Database() {
-        rwlock = new ReentrantReadWriteLock();
-        initialize("./Courses.txt");
     }
 
     /**
@@ -51,7 +49,8 @@ public class Database {
      * loades the courses from the file path specified into the Database, returns
      * true if successful.
      */
-    boolean initialize(String coursesFilePath) {
+    public boolean initialize(String coursesFilePath) {
+        rwlock = new ReentrantReadWriteLock();
         rwlock.writeLock().lock();
         courses = new HashMap<>();
         users = new HashMap<>();
@@ -106,23 +105,27 @@ public class Database {
     }
 
     public Course getCourse(int courseID) throws DatabaseError {
+        rwlock.readLock().lock();
         Course c = courses.get(courseID);
+        rwlock.readLock().unlock();
         if (c == null)
             throw new DatabaseError("course does not exist!");
+
         return c;
     }
 
-    public void courseReg(User user, Course course) throws DatabaseError {
+    public void courseReg(User user, int courseID) throws DatabaseError {
         if (!user.isLoggedIn())
             throw new DatabaseError("user is not logged in!");
         if (!user.isStudent())
             throw new DatabaseError("can't register admin to course!");
+        Course course = getCourse(courseID);
         if (course.getEmptySlots() == 0)
             throw new DatabaseError("no slots!");
-        if (isRegistered(user, course))
+        if (isRegistered(user, courseID))
             throw new DatabaseError("already register to this course!");
         for (Integer kdamID : course.getKdams())
-            if (!isRegistered(user, courses.get(kdamID)))
+            if (!isRegistered(user, kdamID))
                 throw new DatabaseError("missing kdam course " + kdamID);
 
         rwlock.writeLock().lock();
@@ -132,7 +135,8 @@ public class Database {
 
     }
 
-    public boolean isRegistered(User user, Course course) throws DatabaseError {
+    public boolean isRegistered(User user, int courseID) throws DatabaseError {
+        Course course = getCourse(courseID);
         rwlock.readLock().lock();
         boolean ans = course.getStudents().containsKey(user.getUserName());
         rwlock.readLock().unlock();
@@ -148,11 +152,11 @@ public class Database {
     public List<Integer> getStudentCourses(User user) throws DatabaseError {
         if (!user.isStudent())
             throw new DatabaseError("Permission Denied");
-        List<Integer> t = new ArrayList<>();
+        List<Integer> student_courses = new ArrayList<>();
         for (Integer courseID : courses.keySet())
             if (courses.get(courseID).getStudents().containsKey(user.getUserName()))
-                t.add(courseID);
-        return t;
+                student_courses.add(courseID);
+        return student_courses;
     }
 
     public String studentStatus(User user) throws DatabaseError {
@@ -166,18 +170,19 @@ public class Database {
         return ans;
     }
 
-    public void unregisterFromCourse(User user, Course course) throws DatabaseError {
+    public void unregisterFromCourse(User user, int course_id) throws DatabaseError {
         if (!user.isLoggedIn())
             throw new DatabaseError("user is not logged in!");
         if (!user.isStudent())
             throw new DatabaseError("can't unregister admin to course!");
-        if (!isRegistered(user, course))
+        Course course = getCourse(course_id);
+        if (!isRegistered(user, course_id))
             throw new DatabaseError("you are not register to this course!");
 
         course.getStudents().remove(user.getUserName());
     }
 
-    public void logIn(String username, String password) throws DatabaseError {
+    public void login(String username, String password) throws DatabaseError {
         User user = getUser(username);
         if (!user.validatePassword(password))
             throw new DatabaseError("passwords not match!");

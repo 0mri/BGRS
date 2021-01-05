@@ -1,16 +1,16 @@
 package bgu.spl.net.impl.BGRSServer.models.commands;
 
+import java.lang.reflect.Constructor;
+
 import bgu.spl.net.impl.BGRSServer.BGRSProtocol;
 import bgu.spl.net.impl.BGRSServer.api.Command;
 
-public class ACK extends Command {
-    private int _msg_opcode;
-    private String _msg;
+public class ERR extends Command {
+    private int err_code;
 
-    public ACK(int OPCODE, String message) {
-        this.OPCODE = 12;
-        this._msg_opcode = OPCODE;
-        this._msg = message;
+    public ERR(int opcode) {
+        this.OPCODE = 13;
+        this.err_code = opcode;
     }
 
     @Override

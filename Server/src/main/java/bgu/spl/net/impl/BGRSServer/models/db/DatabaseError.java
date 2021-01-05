@@ -1,6 +1,6 @@
 package bgu.spl.net.impl.BGRSServer.models.db;
 
-public class DatabaseError extends Error {
+public class DatabaseError extends Exception {
     public DatabaseError(String message) {
         super(message);
     }

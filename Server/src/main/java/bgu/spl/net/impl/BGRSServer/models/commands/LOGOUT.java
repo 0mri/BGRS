@@ -2,13 +2,21 @@ package bgu.spl.net.impl.BGRSServer.models.commands;
 
 import bgu.spl.net.impl.BGRSServer.BGRSProtocol;
 import bgu.spl.net.impl.BGRSServer.api.Command;
+import bgu.spl.net.impl.BGRSServer.models.db.DatabaseError;
 
-public class LOGOUT implements Command {
+public class LOGOUT extends Command {
+
+    public LOGOUT(String username, String password) {
+        this.OPCODE = 4;
+    }
 
     @Override
     public Command exec(BGRSProtocol bgrsProtocol) {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            DB.logout(bgrsProtocol.getUser());
+        } catch (DatabaseError e) {
+            return new ERR(OPCODE);
+        }
+        return new ACK(OPCODE, "");
     }
-    
 }

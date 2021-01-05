@@ -1,8 +1,11 @@
 package bgu.spl.net.impl.BGRSServer.api;
 
 import bgu.spl.net.impl.BGRSServer.BGRSProtocol;
+import bgu.spl.net.impl.BGRSServer.models.db.Database;
 
-public interface Command {
+public abstract class Command {
+    protected short OPCODE;
+    protected Database DB = Database.getInstance();
 
-    Command exec(BGRSProtocol bgrsProtocol);
+    public abstract Command exec(BGRSProtocol bgrsProtocol);
 }
