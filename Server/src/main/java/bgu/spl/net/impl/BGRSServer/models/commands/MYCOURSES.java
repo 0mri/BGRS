@@ -13,11 +13,13 @@ public class MYCOURSES extends Request {
 
     @Override
     public Command exec(BGRSProtocol bgrsProtocol) {
+        if (bgrsProtocol.getUser() == null)
+            return new ERR(OPCODE);
+
         String ans;
         try {
-            ans = DB.getStudentCourses(bgrsProtocol.getUser()).toString();
+            ans = DB.getStudentCourses(bgrsProtocol.getUser()).toString().replace(" ", "");
         } catch (DatabaseError e) {
-            System.out.println(e);
             return new ERR(OPCODE);
         }
         return new ACK(OPCODE, ans);

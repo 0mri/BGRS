@@ -40,12 +40,7 @@ public abstract class User {
         this._isLoggedIn = false;
     }
 
-    public boolean isEqual(User b) {
-        return this._username.equals(b._username);
-    }
-
     public String toString() {
-        String ans = this._username + " - " + this.getRole();
-        return ans;
+        return this._username;
     }
 }

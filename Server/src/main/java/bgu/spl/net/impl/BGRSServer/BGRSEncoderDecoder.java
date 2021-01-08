@@ -45,7 +45,6 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Command> {
     @Override
     public byte[] encode(Command msg) {
         Response b = (Response) msg;
-        System.out.println(b);
         return b.encode();
     }
 

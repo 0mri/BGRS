@@ -18,7 +18,6 @@ public class STUDENTSTAT extends Request {
         try {
             ans = DB.studentStatus(bgrsProtocol.getUser(), _uname);
         } catch (DatabaseError e) {
-            System.out.println(e);
             return new ERR(OPCODE);
         }
         return new ACK(OPCODE, ans);

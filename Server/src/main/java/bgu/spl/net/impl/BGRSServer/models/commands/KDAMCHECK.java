@@ -14,11 +14,11 @@ public class KDAMCHECK extends Request {
 
     @Override
     public Command exec(BGRSProtocol bgrsProtocol) {
-        String ans = "";
+        String ans;
         try {
-            ans = DB.getCourse(course_id).getKdams().toString();
+            ans = DB.getKdams(course_id).toString().replace(" ", "");
         } catch (DatabaseError e) {
-
+            return new ERR(OPCODE);
         }
         return new ACK(OPCODE, ans);
     }

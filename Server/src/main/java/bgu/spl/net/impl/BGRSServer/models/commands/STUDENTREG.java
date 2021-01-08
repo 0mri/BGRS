@@ -30,15 +30,15 @@ public class STUDENTREG extends Request {
     public Command decode(byte nextByte) {
         if (nextByte == '\0') {
             num_of_zeros++;
-            if (num_of_zeros == 1)
+            if (num_of_zeros == 1) {
                 this._uname = popString(bytes);
-
+            }
             if (num_of_zeros == 2) {
                 this._pwd = popString(bytes);
                 return this;
             }
-        }
-        pushByte(nextByte);
+        } else
+            pushByte(nextByte);
         return null;
     }
 

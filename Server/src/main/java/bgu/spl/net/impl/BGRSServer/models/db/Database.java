@@ -1,11 +1,12 @@
 package bgu.spl.net.impl.BGRSServer.models.db;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -56,8 +57,10 @@ public class Database {
         users = new HashMap<>();
         try {
             for (String line : Files.readAllLines(Paths.get(coursesFilePath))) {
-                String[] course_string = line.split("\\|");
-                courses.add(new Course(course_string));
+                if (!line.isEmpty()) {
+                    String[] course_string = line.split("\\|");
+                    courses.add(new Course(course_string));
+                }
             }
         } catch (IOException e) {
             return false;
@@ -81,16 +84,16 @@ public class Database {
     }
 
     public boolean isRegistered(String username) throws DatabaseError {
-        rwlock.readLock().lock();
         User user = users.get(username);
-        rwlock.readLock().unlock();
         return user != null;
     }
 
     public User registerUser(String username, String password, Role r) throws DatabaseError {
         rwlock.writeLock().lock();
-        if (isRegistered(username))
+        if (isRegistered(username)) {
+            rwlock.writeLock().unlock();
             throw new DatabaseError("username already exist!");
+        }
         User new_user;
         switch (r) {
             case Admin:
@@ -101,7 +104,6 @@ public class Database {
                 break;
         }
         users.put(username, new_user);
-        System.out.println("REGISTER " + username + " - " + password);
         rwlock.writeLock().unlock();
         return new_user;
     }
@@ -151,22 +153,35 @@ public class Database {
         return getCourse(courseID);
     }
 
-    public List<Integer> getStudentCourses(User user) throws DatabaseError {
+    public ArrayList<Integer> getStudentCourses(User user) throws DatabaseError {
         if (!user.isStudent())
             throw new DatabaseError("User is not student");
-        List<Integer> student_courses = new ArrayList<>();
+        ArrayList<Integer> student_courses = new ArrayList<>();
         for (Course course : courses)
             if (course.getStudents().containsKey(user.getUserName()))
                 student_courses.add(course.getID());
         return student_courses;
     }
 
+    public ArrayList<Integer> getKdams(int courseID) throws DatabaseError {
+        ArrayList<Integer> kdams = new ArrayList<>();
+        Set<Integer> c = getCourse(courseID).getKdams();
+        for (Course course : courses)
+            if (c.contains(course.getID()))
+                kdams.add(course.getID());
+
+        return kdams;
+    }
+
     public String studentStatus(User user, String username) throws DatabaseError {
         adminPermissions(user);
         User u1 = getUser(username);
+        if (!u1.isStudent())
+            throw new DatabaseError("there is no courses for admin");
         String ans;
-        ans = String.format("Student: %1$s \n", u1.getUserName());
-        ans += String.format("Courses: %1$s", getStudentCourses(u1));
+        ans = String.format("Student: %1$s \n", u1);
+        ans += String.format("Courses: %1$s", getStudentCourses(u1).toString().replace(" ", ""));
+
         return ans;
     }
 

@@ -21,7 +21,6 @@ public class COURSEREG extends Request {
         try {
             DB.courseReg(bgrsProtocol.getUser(), course_id);
         } catch (DatabaseError e) {
-            System.out.println(e);
             return new ERR(OPCODE);
         }
         return new ACK(OPCODE, "");
@@ -32,7 +31,6 @@ public class COURSEREG extends Request {
         pushByte(nextByte);
         if (len == 2) {
             set(bytesToShort(bytes));
-            System.out.println("COURSE ID: " + this.course_id);
             return this;
         }
 

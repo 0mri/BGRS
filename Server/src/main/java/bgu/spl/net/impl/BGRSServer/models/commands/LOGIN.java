@@ -41,8 +41,8 @@ public class LOGIN extends Request {
                 this._pwd = popString(bytes);
                 return this;
             }
-        }
-        pushByte(nextByte);
+        } else
+            pushByte(nextByte);
         return null;
     }
 

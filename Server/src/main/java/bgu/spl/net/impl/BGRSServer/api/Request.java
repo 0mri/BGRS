@@ -62,7 +62,7 @@ public abstract class Request extends Command {
     }
 
     protected String popString(byte[] bytes) {
-        String result = new String(bytes, StandardCharsets.US_ASCII);
+        String result = new String(bytes, 0, len, StandardCharsets.US_ASCII);
         len = 0;
         bytes = new byte[1 << 10];
         return result;

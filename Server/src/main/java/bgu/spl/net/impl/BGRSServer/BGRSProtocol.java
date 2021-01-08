@@ -20,7 +20,6 @@ public class BGRSProtocol implements MessagingProtocol<Command> {
     }
 
     public void loginUser(User user) {
-        System.out.println("successfully logged in user -" + user.getUserName());
         this.auth_user = user;
     }
 

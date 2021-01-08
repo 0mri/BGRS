@@ -35,8 +35,8 @@ public class ADMINREG extends Request {
                 this._pwd = popString(bytes);
                 return this;
             }
-        }
-        pushByte(nextByte);
+        } else
+            pushByte(nextByte);
         return null;
     }
 
