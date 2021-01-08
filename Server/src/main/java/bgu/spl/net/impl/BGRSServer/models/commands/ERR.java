@@ -1,16 +1,15 @@
 package bgu.spl.net.impl.BGRSServer.models.commands;
 
-import java.lang.reflect.Constructor;
-
 import bgu.spl.net.impl.BGRSServer.BGRSProtocol;
 import bgu.spl.net.impl.BGRSServer.api.Command;
+import bgu.spl.net.impl.BGRSServer.api.Response;
 
-public class ERR extends Command {
-    private int err_code;
+public class ERR extends Response {
+    private short _err_code;
 
-    public ERR(int opcode) {
+    public ERR(short opcode) {
         this.OPCODE = 13;
-        this.err_code = opcode;
+        this._err_code = opcode;
     }
 
     @Override
@@ -18,4 +17,16 @@ public class ERR extends Command {
         return null;
     }
 
+    @Override
+    public byte[] encode() {
+        byte[] opcode = shortToBytes(OPCODE);
+        byte[] err_code = shortToBytes(_err_code);
+
+        return mergeArrays(opcode, err_code);
+    }
+
+    @Override
+    public String toString() {
+        return "ERROR " + _err_code;
+    }
 }

@@ -1,19 +1,17 @@
 package bgu.spl.net.impl.BGRSServer;
 
-import javax.print.DocFlavor.STRING;
-
 import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.impl.BGRSServer.api.Command;
 import bgu.spl.net.impl.BGRSServer.api.User;
 
-public class BGRSProtocol implements MessagingProtocol<String> {
-    private User user = null;
+public class BGRSProtocol implements MessagingProtocol<Command> {
+    private User auth_user = null;
     private boolean shouldTerminate = false;
+    String[] msg;
 
     @Override
-    public String process(String cmd) {
-        return null;
-        // return cmd.exec(this);
+    public Command process(Command cmd) {
+        return cmd.exec(this);
     }
 
     @Override
@@ -21,8 +19,18 @@ public class BGRSProtocol implements MessagingProtocol<String> {
         return this.shouldTerminate;
     }
 
+    public void loginUser(User user) {
+        System.out.println("successfully logged in user -" + user.getUserName());
+        this.auth_user = user;
+    }
+
+    public void logoutUser() {
+        this.auth_user = null;
+        this.shouldTerminate = true;
+    }
+
     public User getUser() {
-        return this.user;
+        return this.auth_user;
     }
 
 }

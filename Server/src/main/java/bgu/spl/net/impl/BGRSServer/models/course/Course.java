@@ -54,7 +54,7 @@ public class Course {
     public String toString() {
         String ans = String.format("Course: (%1$s) %2$s \n", courseNum, courseName);
         ans += String.format("Seats Available: %1$s/%2$s \n", getEmptySlots(), numOfMaxStudents);
-        ans += String.format("Students Registered: %1$s \n", this.students.keySet());
+        ans += String.format("Students Registered: %1$s", this.students.keySet() + " ");
         return ans;
     }
 }

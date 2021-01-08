@@ -23,7 +23,10 @@ public class Reactor<T> implements Server<T> {
     private Thread selectorThread;
     private final ConcurrentLinkedQueue<Runnable> selectorTasks = new ConcurrentLinkedQueue<>();
 
-    public Reactor(int numThreads, int port, Supplier<MessagingProtocol<T>> protocolFactory,
+    public Reactor(
+            int numThreads,
+            int port,
+            Supplier<MessagingProtocol<T>> protocolFactory,
             Supplier<MessageEncoderDecoder<T>> readerFactory) {
 
         this.pool = new ActorThreadPool(numThreads);
@@ -34,37 +37,41 @@ public class Reactor<T> implements Server<T> {
 
     @Override
     public void serve() {
-        selectorThread = Thread.currentThread();
-        try (Selector selector = Selector.open(); ServerSocketChannel serverSock = ServerSocketChannel.open()) {
+	selectorThread = Thread.currentThread();
+        try (Selector selector = Selector.open();
+                ServerSocketChannel serverSock = ServerSocketChannel.open()) {
 
-            this.selector = selector; // just to be able to close
+            this.selector = selector; //just to be able to close
 
             serverSock.bind(new InetSocketAddress(port));
             serverSock.configureBlocking(false);
             serverSock.register(selector, SelectionKey.OP_ACCEPT);
-            System.out.println("Server listening on port " + this.port);
+			System.out.println("Server started");
 
             while (!Thread.currentThread().isInterrupted()) {
 
                 selector.select();
                 runSelectionThreadTasks();
 
-                for (SelectionKey key : selector.selectedKeys())
-                    if (!key.isValid())
-                        continue;
-                    else if (key.isAcceptable())
-                        handleAccept(serverSock, selector);
-                    else
-                        handleReadWrite(key);
+                for (SelectionKey key : selector.selectedKeys()) {
 
-                selector.selectedKeys().clear(); // clear the selected keys set so that we can know about new events
+                    if (!key.isValid()) {
+                        continue;
+                    } else if (key.isAcceptable()) {
+                        handleAccept(serverSock, selector);
+                    } else {
+                        handleReadWrite(key);
+                    }
+                }
+
+                selector.selectedKeys().clear(); //clear the selected keys set so that we can know about new events
 
             }
 
         } catch (ClosedSelectorException ex) {
-            // do nothing - server was requested to be closed
+            //do nothing - server was requested to be closed
         } catch (IOException ex) {
-            // this is an error
+            //this is an error
             ex.printStackTrace();
         }
 
@@ -72,7 +79,7 @@ public class Reactor<T> implements Server<T> {
         pool.shutdown();
     }
 
-    /* package */ void updateInterestedOps(SocketChannel chan, int ops) {
+    /*package*/ void updateInterestedOps(SocketChannel chan, int ops) {
         final SelectionKey key = chan.keyFor(selector);
         if (Thread.currentThread() == selectorThread) {
             key.interestOps(ops);
@@ -84,11 +91,15 @@ public class Reactor<T> implements Server<T> {
         }
     }
 
+
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
         clientChan.configureBlocking(false);
-        final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(readerFactory.get(),
-                protocolFactory.get(), clientChan, this);
+        final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
+                readerFactory.get(),
+                protocolFactory.get(),
+                clientChan,
+                this);
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 
@@ -97,14 +108,13 @@ public class Reactor<T> implements Server<T> {
         NonBlockingConnectionHandler<T> handler = (NonBlockingConnectionHandler<T>) key.attachment();
 
         if (key.isReadable()) {
-
             Runnable task = handler.continueRead();
             if (task != null) {
                 pool.submit(handler, task);
             }
         }
 
-        if (key.isValid() && key.isWritable()) {
+	    if (key.isValid() && key.isWritable()) {
             handler.continueWrite();
         }
     }
@@ -119,5 +129,4 @@ public class Reactor<T> implements Server<T> {
     public void close() throws IOException {
         selector.close();
     }
-
 }

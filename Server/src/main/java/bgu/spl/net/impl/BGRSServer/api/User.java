@@ -24,10 +24,6 @@ public abstract class User {
         return this._username;
     }
 
-    public String getPassword() {
-        return this._password;
-    }
-
     public boolean isLoggedIn() {
         return this._isLoggedIn;
     }
@@ -42,5 +38,14 @@ public abstract class User {
 
     public void logout() {
         this._isLoggedIn = false;
+    }
+
+    public boolean isEqual(User b) {
+        return this._username.equals(b._username);
+    }
+
+    public String toString() {
+        String ans = this._username + " - " + this.getRole();
+        return ans;
     }
 }

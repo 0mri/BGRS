@@ -2,21 +2,22 @@ package bgu.spl.net.impl.BGRSServer.models.commands;
 
 import bgu.spl.net.impl.BGRSServer.BGRSProtocol;
 import bgu.spl.net.impl.BGRSServer.api.Command;
+import bgu.spl.net.impl.BGRSServer.api.Request;
 import bgu.spl.net.impl.BGRSServer.api.User.Role;
 import bgu.spl.net.impl.BGRSServer.models.db.DatabaseError;
 
-public class STUDENTREG extends Command {
-    private final String _uname;
-    private final String _pwd;
+public class STUDENTREG extends Request {
+    private String _uname = null;
+    private String _pwd = null;
 
-    public STUDENTREG(String username, String password) {
-        this.OPCODE = 2;
-        this._uname = username;
-        this._pwd = password;
+    public STUDENTREG(short opcode) {
+        this.OPCODE = opcode;
     }
 
     @Override
     public Command exec(BGRSProtocol bgrsProtocol) {
+        if (bgrsProtocol.getUser() != null)
+            return new ERR(OPCODE);
         try {
             DB.registerUser(_uname, _pwd, Role.Student);
         } catch (DatabaseError e) {
@@ -24,4 +25,21 @@ public class STUDENTREG extends Command {
         }
         return new ACK(OPCODE, "");
     }
+
+    @Override
+    public Command decode(byte nextByte) {
+        if (nextByte == '\0') {
+            num_of_zeros++;
+            if (num_of_zeros == 1)
+                this._uname = popString(bytes);
+
+            if (num_of_zeros == 2) {
+                this._pwd = popString(bytes);
+                return this;
+            }
+        }
+        pushByte(nextByte);
+        return null;
+    }
+
 }

@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class EchoClient {
 
     public static void main(String[] args) throws IOException {
-        byte a = 112;
+        byte a = 012;
         if (args.length == 0) {
             args = new String[] { "localhost", "hello" };
         }
@@ -21,18 +23,23 @@ public class EchoClient {
         }
 
         // BufferedReader and BufferedWriter automatically using UTF-8 encoding
-        try (Socket sock = new Socket(args[0], 7777);
-                BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            // int aa = "alan".getBytes();
+            try (Socket sock = new Socket(args[0], 7777);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()))) {
 
-            System.out.println("sending message to server");
-            out.write(args[1]);
-            out.newLine();
-            out.flush();
+                System.out.println("Send message to server: ");
+                String input = sc.nextLine();
+                out.write(input);
+                out.newLine();
+                out.flush();
 
-            System.out.println("awaiting response");
-            String line = in.readLine();
-            System.out.println("message from server: " + line);
+            }
+            // System.out.println("awaiting response");
+            // String line = in.readLine();
+            // System.out.println("message from server: " + line);
         }
     }
 }
