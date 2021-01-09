@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <connectionHandler.h>
 #include "IOTask.h"
+#include <thread>
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
+
 int main(int argc, char *argv[])
 {
     if (argc < 3)
@@ -21,13 +23,15 @@ int main(int argc, char *argv[])
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
+
     std::mutex mutex;
-    IOTask write(mutex, connectionHandler);
-    IOTask read(mutex, connectionHandler);
+    IOTask io(mutex, connectionHandler);
+    // IOTask read(mutex, connectionHandler);
 
-    std::thread w(&IOTask::write, &write);
-    std::thread r(&IOTask::read, &read);
+    std::thread w(&IOTask::write, &io);
+    std::thread r(&IOTask::read, &io);
     w.join();
-
+    // w.join();
+    r.join();
     return 0;
 }

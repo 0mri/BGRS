@@ -1,6 +1,5 @@
 {
     "files.associations": {
-        "ostream": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -26,6 +25,7 @@
         "list": "cpp",
         "unordered_map": "cpp",
         "vector": "cpp",
+        "exception": "cpp",
         "algorithm": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
@@ -51,6 +51,7 @@
         "limits": "cpp",
         "mutex": "cpp",
         "new": "cpp",
+        "ostream": "cpp",
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
@@ -58,7 +59,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "*.ipp": "cpp",
-        "exception": "cpp"
+        "strstream": "cpp",
+        "cfenv": "cpp",
+        "*.ipp": "cpp"
     }
 }
