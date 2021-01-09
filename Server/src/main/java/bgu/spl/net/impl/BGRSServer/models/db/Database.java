@@ -1,7 +1,6 @@
 package bgu.spl.net.impl.BGRSServer.models.db;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -72,9 +71,6 @@ public class Database {
     }
 
     public User getUser(String username) throws DatabaseError {
-        // for (String user : this.users.keySet())
-        // System.out.println(users.get(user).getUserName().equals("omri"));
-
         rwlock.readLock().lock();
         User user = users.get(username);
         rwlock.readLock().unlock();
